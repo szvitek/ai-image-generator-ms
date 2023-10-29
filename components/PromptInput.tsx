@@ -1,9 +1,22 @@
 'use client';
 
+import { fetchSuggestionFromChatGPT } from '@/lib/helpers';
 import { useState } from 'react';
+import useSWR from 'swr';
 
 function PromptInput() {
   const [input, setInput] = useState('');
+
+  const {
+    data: suggestion,
+    isLoading,
+    mutate,
+    isValidating,
+  } = useSWR('/api/suggestion', fetchSuggestionFromChatGPT, {
+    revalidateOnFocus: false,
+  });
+
+  const loading = isLoading || isValidating;
 
   return (
     <div className="m-10">
@@ -12,7 +25,11 @@ function PromptInput() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="flex-1 p-4 outline-none rounded-md"
-          placeholder="Enter a prompt..."
+          placeholder={
+            (loading && 'ChatGPT is thinking of a suggestion...') ||
+            suggestion ||
+            'Enter a prompt...'
+          }
         />
         <button
           className={`p-4 font-bold transition-colors duration-200 ${
@@ -28,10 +45,21 @@ function PromptInput() {
         <button className="p-4 bg-violet-400 text-white transition-colors duration-200 font-bold disabled:text-gray-300 disabled:cursor-not-allowed disabled:bg-gray-400">
           Use Suggestion
         </button>
-        <button className="p-4 bg-white text-violet-500 border-none transition-colors duration-200 rounded-b-md md:rounded-r-md md:rounded-bl-none font-bold">
+        <button
+          className="p-4 bg-white text-violet-500 border-none transition-colors duration-200 rounded-b-md md:rounded-r-md md:rounded-bl-none font-bold"
+          onClick={() => mutate()}
+        >
           New Suggestion
         </button>
       </form>
+      {input && (
+        <p className="italic pt-2 pl-2 font-light">
+          Suggestion:{' '}
+          <span className="text-violet-500">
+            {loading ? 'ChatGPT is thinking...' : suggestion}
+          </span>
+        </p>
+      )}
     </div>
   );
 }
