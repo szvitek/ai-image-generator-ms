@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchSuggestionFromChatGPT } from '@/lib/helpers';
+import { fetchImages, fetchSuggestionFromChatGPT } from '@/lib/helpers';
 import { FormEvent, useState } from 'react';
 import useSWR from 'swr';
 
@@ -13,6 +13,12 @@ function PromptInput() {
     mutate,
     isValidating,
   } = useSWR('/api/suggestion', fetchSuggestionFromChatGPT, {
+    revalidateOnFocus: false,
+  });
+
+  const {
+    mutate: refreshImages,
+  } = useSWR('/api/getImages', fetchImages, {
     revalidateOnFocus: false,
   });
 
@@ -32,6 +38,7 @@ function PromptInput() {
     });
 
     const data = await res.json();
+    refreshImages();
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

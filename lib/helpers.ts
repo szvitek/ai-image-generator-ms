@@ -1,9 +1,17 @@
 const fetchSuggestionFromChatGPT = async () => {
   const res = await fetch('/api/suggestion', {
-    cache: 'no-store'
-  })
+    cache: 'no-store',
+  });
 
   return res.json();
-}
+};
 
-export { fetchSuggestionFromChatGPT }
+const fetchImages = async () => {
+  const res = await fetch('/api/getImages', {
+    cache: 'no-store',
+  });
+
+  return res.json();
+};
+
+export { fetchSuggestionFromChatGPT, fetchImages };
