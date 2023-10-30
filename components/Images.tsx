@@ -18,8 +18,6 @@ function Images() {
     revalidateOnFocus: false,
   });
 
-  console.log(images);
-
   return (
     <div>
       <button

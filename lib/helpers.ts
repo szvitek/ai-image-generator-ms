@@ -1,5 +1,5 @@
 const azure_base_url =
-  process.env.NODE_ENV.toLowerCase() !== 'production'
+  process.env.NODE_ENV.toLowerCase() == 'production'
     ? process.env.AZURE_BASE_URL
     : 'http://localhost:7071';
 
