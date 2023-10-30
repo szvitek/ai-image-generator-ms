@@ -1,7 +1,7 @@
 'use client';
 
 import { fetchSuggestionFromChatGPT } from '@/lib/helpers';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import useSWR from 'swr';
 
 function PromptInput() {
@@ -18,9 +18,34 @@ function PromptInput() {
 
   const loading = isLoading || isValidating;
 
+  const submitPrompt = async (useSuggestion?: boolean) => {
+    const inputPrompt = input;
+    setInput('');
+
+    // p = prompt to send API
+    const p = useSuggestion ? suggestion : inputPrompt;
+
+    const res = await fetch('/api/generateImage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: p }),
+    });
+
+    const data = await res.json();
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    await submitPrompt();
+  };
+
   return (
     <div className="m-10">
-      <form className="flex flex-col lg:flex-row shadow-md shadow-slate-400/10 border rounded-md lg:divide-x">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col lg:flex-row shadow-md shadow-slate-400/10 border rounded-md lg:divide-x"
+      >
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -42,11 +67,16 @@ function PromptInput() {
         >
           Generate
         </button>
-        <button className="p-4 bg-violet-400 text-white transition-colors duration-200 font-bold disabled:text-gray-300 disabled:cursor-not-allowed disabled:bg-gray-400">
+        <button
+          className="p-4 bg-violet-400 text-white transition-colors duration-200 font-bold disabled:text-gray-300 disabled:cursor-not-allowed disabled:bg-gray-400"
+          type="button"
+          onClick={() => submitPrompt(true)}
+        >
           Use Suggestion
         </button>
         <button
           className="p-4 bg-white text-violet-500 border-none transition-colors duration-200 rounded-b-md md:rounded-r-md md:rounded-bl-none font-bold"
+          type="button"
           onClick={() => mutate()}
         >
           New Suggestion

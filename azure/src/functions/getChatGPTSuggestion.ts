@@ -14,8 +14,6 @@ export async function getChatGPTSuggestion(
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  const name = request.query.get('name') || (await request.text()) || 'world';
-
   const prompt =
     'Write a random text prompt for DALL-E to generate an image, this prompt will be shown to the user, include details such as the genre and what type of painting it should be, options can include: oil painting, watercolor, photo-realistic, 4k, abstract, modern, black and white etc. Do not wrap the answer in quotes.';
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
@@ -24,13 +22,14 @@ export async function getChatGPTSuggestion(
     max_tokens: 100,
     temperature: 0.8,
   };
+  context.log(`prompt "${prompt}, params ${params}"`);
   const chatCompletion = await openai.chat.completions.create(params);
 
   return { body: chatCompletion.choices[0].message.content };
 }
 
 app.http('getChatGPTSuggestion', {
-  methods: ['GET', 'POST'],
+  methods: ['GET'],
   authLevel: 'anonymous',
   handler: getChatGPTSuggestion,
 });
